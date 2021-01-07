@@ -2,167 +2,178 @@
 <html>
 
 <head>
-    <meta charset='utf-8'>
-    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
     <title>GF</title>
-    <meta name='viewport' content='width=device-width, initial-scale=1'>
-    <link rel='stylesheet' type='text/css' media='screen' href='main.css'>
-    <script src='main.js'></script>
 </head>
 
 <body>
-    <h1>test moises</h1>
-    <button onclick="add_tab();">Agregar Pestaña</button>
-    <button onclick="metodo1();">Eliminar pestaña</button>
-    <button onclick="metodo2();">get data</button>
-    <div id="pestanas">
-        <ul id="lista_pestanas">
-        </ul>
-    </div>
 
-    <body>
-        <div id="contenidopestanas">
-        </div>
-    </body>
+    <h1>test </h1>
+
+    <button onclick="action_print_data_textarea();">get data</button>
+    <button onclick="action_message();">get</button>
+
+
+    <table>
+        <tr>
+            <td style="border-width: unset;">
+                <button class="button_mas" onclick="add_tab();">+</button>
+            </td>
+            <td>
+                <div id="pestanas">
+                    <ul id="lista_pestanas"> </ul>
+                </div>
+            </td>
+        </tr>
+    </table>
+
+    <div id="contenidopestanas"> </div>
+
 </body>
 
-<script src="./js/index.js" type="text/javascript"></script>
+
 <script src="./codemirror/jquery-1.7.2.min.js" type="text/javascript"></script>
 <script src="./codemirror/lib/codemirror.js"></script>
 <link rel="stylesheet" href="./codemirror/lib/codemirror.css">
 <link rel="stylesheet" href="./css/index.css" type="text/css" />
-<link rel="stylesheet" href="./js/dist/themes/default/style.min.css" />
-<script src="./js/dist/jquery.min.js" type="text/javascript"></script>
-<script src="./js/jstree.js" type="text/javascript"></script>
-<script src="./js/dist/jstree.min.js" type="text/javascript"></script>
+
+<link rel="stylesheet" href="./codemirror/theme/ambiance.css">
+<script src="./codemirror/mode/sql/sql.js"></script>
 
 
 <script>
 
-    var contador = 0;
-    var lista = new Array();
-    var vent_focus = "pestana1";
+    var contador = 0;                   //cuantas pestañas estan vivas
+    var ventana_focus = "pestana1";     //nombre de la pestaña que esta activa
 
-    function linkedlist(pestana, nombre) {
-        var obj = new Object();
-        obj.pestana = pestana;
-        obj.nombre = nombre;
-        lista.push(obj);
+    function action_message() {
+        alert(" ventana_focus: " + ventana_focus + " - " + ventana_focus.replace("pestana", ""))
     }
-    function metodo1() {
-        //alert("dato: "+contador+ " focus: " +vent_focus+" : "+vent_focus.replace("textarea",""))
-        
-        $('body #pestana'+vent_focus.replace("textarea","")).remove();
-        index("pestanas", "pestana0");
-    }
-    function metodo2() {
-        
-        var data = document.getElementById(get_vent());
-        
-        alert(data.value)
+    
+    /* ----------------------------------------  FUNCIONES PARA TEXTAREA ---------------------------------------- */
 
+    function get_data_textarea() {
+        return document.getElementById(get_name_vent()).value;
     }
 
-    function get_vent() {
-        return vent_focus;
+    function set_data_textarea(content) {
+        //TODO test funcion 
+        var textarea= document.getElementById(ventana_focus)
+        textarea.text= content
     }
 
-    function set_vent(vent) {
-        vent_focus = vent;
+    function action_print_data_textarea() {
+        alert(get_data_textarea());
     }
 
-    function get_cont() {
+    /* ---------------------------------------- FUNCIONES PARA TAB ---------------------------------------- */
+
+    function remove_tab(tab) {
+        $('body #pestana' + tab.id.replace("pestana", "")).remove();
+        //TODO cuando elimino un tab me tiene que poner en focus otro
+        //index("pestanas", "pestana0");
+    }
+
+    function get_name_vent() {
+        return ventana_focus;
+    }
+
+    function set_name_vent(vent) {
+        ventana_focus = vent;
+    }
+
+    function get_next_contador() {
         return contador++;
     }
 
-    function index(pestanias, pestania) {
-        var id = pestania.replace('pestana', '');
-        set_vent('textarea' + id);
 
-        var pestanna1 = document.getElementById(pestania);
-        var listaPestannas = document.getElementById(pestanias);
-        var cpestanna = document.getElementById('c' + pestania);
-        var listacPestannas = document.getElementById('contenido' + pestanias);
+    function add_tab() {
+        var x = get_next_contador();
+
+        // traer el div que tiene la lista de pestañas (lista desordenada <ul>)
+        var ul = document.getElementById("lista_pestanas");
+
+        // creamos un nuevo: elemento para la lista (<li>) 
+        var li = document.createElement("li");
+        li.setAttribute('id', 'pestana' + x);
+
+        // creamos los elementos (<a> <button>) dentro del nuevo <li>
+        var a = document.createElement("a");
+        a.setAttribute('id', 'a' + x);
+        a.setAttribute('href', 'javascript:index("pestana' + x + '")');
+        a.text = 'tab ' + x;  //nombre que muestra al usuario
+
+        li.appendChild(a);
+        //boton para cerrar pestaña
+        li.innerHTML += '&nbsp;&nbsp;&nbsp;<button id="pestana' + x + '" class="button_cerrar" onclick="remove_tab(this);">x</button>'
+        ul.appendChild(li);
+
+        var div_textareas = document.getElementById("contenidopestanas");
+        var div_new = document.createElement("div");
+        div_new.setAttribute('id', 'cpestana' + x);               //identificador de cada div
+        var textarea = document.createElement("textarea");
+        textarea.setAttribute('id', 'textarea' + x);              //identificador de cada textarea 
+        textarea.setAttribute('name', 'textarea' + x);
+        textarea.setAttribute('class', 'textarea');
+        textarea.setAttribute('style', 'display:none');
+        textarea.cols = 123;                                      //dimensiones del text
+        textarea.rows = 30;
+
+        div_new.appendChild(textarea);
+        div_textareas.appendChild(div_new);
+
+        index("pestana" + x);
+
+    }
+
+    function index(pestania) {
+        var id = pestania.replace('pestana', '');
+        set_name_vent('textarea' + id);
+
+        var tab = document.getElementById(pestania);                            //es un <li>
+        var div_pestanas = document.getElementById("pestanas");                 //es un <div> que tiene <ul>
+        var cont_pestana = document.getElementById('c' + pestania);             //es un <div> y adentro tiene el <textarea>
+        var div_cont_pestanas = document.getElementById('contenidopestanas' );  //es un <div> de <div>'s 
 
         var i = 0;
-        while (typeof listacPestannas.getElementsByTagName('div')[i] != 'undefined') {
+        while (typeof div_cont_pestanas.getElementsByTagName('div')[i] != 'undefined') {
             $(document).ready(function () {
-                $(listacPestannas.getElementsByTagName('div')[i]).css('display', 'none');
-                $(listaPestannas.getElementsByTagName('li')[i]).css('background', '');
-                $(listaPestannas.getElementsByTagName('li')[i]).css('padding-bottom', '');
+                $(div_cont_pestanas.getElementsByTagName('div')[i]).css('display', 'none');
+                $(div_pestanas.getElementsByTagName('li')[i]).css('background', '');
+                $(div_pestanas.getElementsByTagName('li')[i]).css('padding-bottom', '');
             });
             i += 1;
         }
 
         $(document).ready(function () {
-            $(cpestanna).css('display', '');
-            $(pestanna1).css('background', 'dimgray');
-            $(pestanna1).css('padding-bottom', '2px');
+            $(cont_pestana).css('display', '');
+            $(tab).css('background', 'dimgray');
+            $(tab).css('padding-bottom', '2px');
         });
 
         try {
-            var act = document.getElementById('cpestana' + id);
-            var tact = document.getElementById('textarea' + id);
+            var div_cont_pestana = document.getElementById('cpestana' + id);
+            var textarea = document.getElementById('textarea' + id);
 
-            while (act.firstChild) {
-                act.removeChild(act.firstChild);
+            while (div_cont_pestana.firstChild) {
+                div_cont_pestana.removeChild(div_cont_pestana.firstChild);
             }
+            //mostreamos el textarea correspondiente
+            div_cont_pestana.appendChild(textarea);
 
-            act.appendChild(tact);
-            var editor = CodeMirror(act, {
+            var editor = CodeMirror(div_cont_pestana, {
                 lineNumbers: true,
-                value: tact.value,
+                value: textarea.value,   //se pone la data de ese textarea
                 matchBrackets: true,
                 styleActiveLine: true,
-                theme: "eclipse",
-                mode: "text/x-java"
+                theme: "ambiance",
+                mode: "sql"
             }).on('change', editor => {
-                tact.value = editor.getValue();
+                textarea.value = editor.getValue();
             });
         } catch (error) { }
     }
 
-    function add_tab() {
-        console.log("texto metodo add_tab----------------------")
-        var x = get_cont();
-        var lista_pestañas = document.getElementById("lista_pestanas");
-        var li = document.createElement("li");
-        li.setAttribute('id', 'pestana' + x);
-        var a = document.createElement("a");
-        a.setAttribute('id', 'a' + x);
-        a.setAttribute('href', 'javascript:index("pestanas","pestana' + x + '")');
-        a.text = 'pestana' + x;
-        li.appendChild(a);
-        lista_pestañas.appendChild(li);
-        index("pestanas", "pestana" + x);
-
-        var contenido = document.getElementById("contenidopestanas");
-        var divp = document.createElement("div");
-        divp.setAttribute('id', 'cpestana' + x);
-        var ta = document.createElement("textarea");
-        ta.setAttribute('id', 'textarea' + x);
-        ta.setAttribute('name', 'textarea' + x);
-        ta.setAttribute('class', 'ta');
-        ta.setAttribute('style', 'display:none');
-        ta.cols = 123;
-        ta.rows = 30;
-        divp.appendChild(ta);
-        contenido.appendChild(divp);
-
-        var act = document.getElementById('cpestana' + x);
-        var tact = document.getElementById('textarea' + x);
-        var editor = CodeMirror(act, {
-            lineNumbers: true,
-            value: tact.value,
-            matchBrackets: true,
-            styleActiveLine: true,
-            theme: "eclipse",
-            mode: "text/x-java"
-        }).on('change', editor => {
-            tact.value = editor.getValue();
-        });
-    }
+    
 
 </script>
-
 </html>
