@@ -10,7 +10,6 @@
     <h1>test </h1>
 
     <button onclick="action_print_data_textarea();">get data</button>
-    <button onclick="action_message();">get</button>
 
 
     <table>
@@ -44,10 +43,7 @@
 
     var contador = 0;                   //cuantas pestañas estan vivas
     var ventana_focus = "pestana1";     //nombre de la pestaña que esta activa
-
-    function action_message() {
-        alert(" ventana_focus: " + ventana_focus + " - " + ventana_focus.replace("pestana", ""))
-    }
+    var lista_pos = new Array();
     
     /* ----------------------------------------  FUNCIONES PARA TEXTAREA ---------------------------------------- */
 
@@ -69,8 +65,16 @@
 
     function remove_tab(tab) {
         $('body #pestana' + tab.id.replace("pestana", "")).remove();
-        //TODO cuando elimino un tab me tiene que poner en focus otro
-        //index("pestanas", "pestana0");
+        
+        var pos= lista_pos.indexOf(Number( tab.id.replace("pestana", "")))
+        if (pos+1!=lista_pos.length){
+            lista_pos.splice(pos,1)
+            index("pestana"+lista_pos[pos])
+        }else{
+            lista_pos.splice(pos,1)
+            index("pestana"+lista_pos[pos-1])
+        }
+       
     }
 
     function get_name_vent() {
@@ -88,6 +92,8 @@
 
     function add_tab() {
         var x = get_next_contador();
+        lista_pos.push(x);
+        console.log(lista_pos)
 
         // traer el div que tiene la lista de pestañas (lista desordenada <ul>)
         var ul = document.getElementById("lista_pestanas");
@@ -173,7 +179,6 @@
         } catch (error) { }
     }
 
-    
 
 </script>
 </html>
